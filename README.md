@@ -9,6 +9,11 @@ This project is designed for ease of use and demonstration, making it ideal for 
 
 ---
 
+<p align="center">
+  <img src= width="100%">
+</p>
+
+
 ## 🚀 Features
 
 - Single-file chatbot project (no setup required)
