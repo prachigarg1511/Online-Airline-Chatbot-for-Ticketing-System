@@ -10,7 +10,7 @@ This project is designed for ease of use and demonstration, making it ideal for 
 ---
 
 <p align="center">
-  <img src= width="100%">
+  <img src= "https://github.com/prachigarg1511/Online-Airline-Chatbot-for-Ticketing-System/blob/main/ChatGPT%20Image%20Oct%2029%2C%202025%2C%2008_45_08%20PM.png" width="100%">
 </p>
 
 
