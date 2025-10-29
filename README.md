@@ -34,7 +34,7 @@ No backend, no external dependencies — just open and use.
 
 ---
 
-## 🌟 Future Features (Can Be Added)
+## 🌟 Future Features
 
 - Real airline API integration  
 - Voice chatbot support  
