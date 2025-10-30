@@ -50,9 +50,9 @@ No backend, no external dependencies — just open and use.
 ---
 📚 Libraries Used
 
--JsPDF 
--QRious
--Google Forms API
+-[jsPDF](https://github.com/parallax/jsPDF)-Generates downloadable PDFs.
+-[Qrious](https://github.com/neocotic/qrious)-Creates QR Code scanner from texts, links, PDFs.
+-[Google Forms API](https://googleapis/google-api-nodejs-client/tree/main/samples/forms)-Submit form responses programmatically (without opening Google Form).
 
 ---
  Simulated APIs
