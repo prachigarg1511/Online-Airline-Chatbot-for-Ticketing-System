@@ -48,14 +48,14 @@ No backend, no external dependencies — just open and use.
 - Payment gateway for final booking  
 
 ---
-##📚 Libraries Used
+📚 Libraries Used
 
 -JsPDF 
 -QRious
 -Google Forms API
 
 ---
-## Simulated APIs
+ Simulated APIs
 
 -Flight Data Generation(mock)
 -Weather Data(placeholder)
