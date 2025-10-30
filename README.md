@@ -61,9 +61,14 @@ No backend, no external dependencies — just open and use.
 ---
  Simulated APIs
 
--Flight Data Generation(mock)
--Weather Data(placeholder)
--UPI QR Generation(Local only)
+-[Flight Data Generation(mock)](https://github.com/public-apis/public-apis)-Generates sample flight information (arrival, departure, timings, fare etc.)
+
+
+-[Weather Data(placeholder)](https://github.com/robertoduessmann/weather-api)-Used to display weather info without real-time API calls (static data).  
+
+
+-[UPI QR Generation(Local only)](https://github.com/neocotic/qrious)-Generates payment QR codes using local machine / browser only (no server).  
+
 
 ---
 
