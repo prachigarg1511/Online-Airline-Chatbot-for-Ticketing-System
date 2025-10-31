@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>SkySwift — Flight Booking</title>
+<meta content="A fully‑featured flight booking demo website with rich styling, filters, seat selection, mock payment, and bookings storage." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<!-- jsPDF for PDF receipts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- QRCode generator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<link href="style.css" rel="stylesheet"/>
+<!-- jsPDF & QRious (ensured) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+</head>
+<body>
+  <div id="loginOverlay">
+  <h2>Login Portal</h2>
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- MAIN PROJECT CONTENT (hidden until login) -->
+<div id="mainContent" style="display:none;">
+
+  <!-- Logout button -->
+  <button onclick="logout()" id="logoutBtn">Logout</button>
+</div>
+
+<header>
+<div class="container nav">
+<div class="brand">
+<div aria-hidden="true" class="logo">✈️</div>
+<b>SkySwift</b>
+</div>
+<nav class="navlinks">
+<a class="active" data-link="" href="#home">Home</a>
+<a data-link="" href="#results">Flights</a>
+<a data-link="" href="#mytrips">My Trips</a>
+<a data-link="" href="#chatbot">Chatbot</a>
+<a data-link="" href="#support">Support</a>
+<a data-link="" href="#whybook">Why Book With Us?</a>
+<a data-link="" href="#reviews">Reviews</a>
+<a href="javascript:void(0)" onclick="openLogin()">Sign In</a>
+</nav>
+
+<div class="actions">
+<button aria-label="Toggle theme" class="btn ghost" id="btnTheme">🌙</button>
+</div>
+</div>
+</header>
+<!-- Login Modal -->
+<div class="modal" id="loginModal">
+<div class="modal-content">
+<span class="close" onclick="closeLogin()">×</span>
+<h2>Login</h2>
+<form>
+<div class="input-group">
+<label>Email</label>
+<input placeholder="Enter your email" required="" type="email"/>
+</div>
+<div class="input-group">
+<label>Password</label>
+<input placeholder="Enter your password" required="" type="password"/>
+</div>
+<div class="social-login">
+<button class="google">Continue with Google</button>
+<button class="amazon">Continue with Amazon</button>
+<button class="facebook">Continue with Facebook</button>
+</div>
+<button class="submit-btn" type="submit">Sign In</button>
+</form>
+</div>
+</div>
+<main class="container">
+<!-- HERO / SEARCH -->
+<section class="hero" id="home">
+<div class="hero-grid">
+<div class="card">
+<h2>Welcome to SkySwift</h2>
+<p>Book your flights easily with SkySwift!</p>
+<div class="badges">
+<span class="chip">No booking fees</span>
+<span class="chip">24×7 support</span>
+<span class="chip">Free seat selection</span>
+</div>
+<h1 class="headline">Find, compare &amp; book flights — fast.</h1>
+<p class="sub">Search 100+ airlines. Filter by time, stops, and price. Hold seats and pay securely. All in one place.</p>
+<form autocomplete="off" id="searchForm">
+<div class="field">
+<label class="label" for="from">From</label>
+<input class="input" id="from" name="from" placeholder="e.g. Delhi (DEL)" required="">
+</input></div>
+<div class="field">
+<label class="label" for="to">To</label>
+<input class="input" id="to" name="to" placeholder="e.g. Mumbai (BOM)" required="">
+</input></div>
+<div class="field">
+<label class="label" for="depart">Depart</label>
+<input class="input" id="depart" name="depart" required="" type="date"/>
+</div>
+<div class="field">
+<label class="label" for="return">Return</label>
+<input class="input" id="return" name="return" type="date"/>
+</div>
+<div class="field">
+<label class="label" for="pax">Passengers</label>
+<select class="select" id="pax" name="pax">
+<option>1 Adult</option>
+<option>2 Adults</option>
+<option>3 Adults</option>
+<option>4 Adults</option>
+</select>
+</div>
+<div class="field">
+<label class="label" for="cabin">Cabin</label>
+<select class="select" id="cabin" name="cabin">
+<option>Economy</option>
+<option>Premium Economy</option>
+<option>Business</option>
+<option>First</option>
+</select>
+</div>
+<button class="btn" style="grid-column:1/-1" type="submit">🔎 Search Flights</button>
+</form>
+<p class="hint" id="searchHint"></p>
+</div>
+<div class="home-layout">
+<!-- Left side: Easy Booking Image -->
+<div class="feature-image">
+<img alt="Easy Booking in 3 Steps" src="https://www.booking2hotels.com/assets/img/booking-engine/pic1.png"/>
+</div>
+<style>
+      .feature-image{
+        text-align:center;
+        margin:20px O;
+      }
+
+      .feature-image img{
+        border-radius:12px;
+        max-width:90%;
+      }
+    </style>
+<div aria-live="polite" class="card">
+<h3 style="margin:0 0 10px">Trending routes</h3>
+<div class="result-list" id="trending"></div>
+</div>
+</div>
+</div></section>
+<!-- RESULTS -->
+<section id="results" style="display:none">
+<div class="steps">
+<span class="step active" data-step="1">1. Choose flight</span>
+<span class="step" data-step="2">2. Passengers &amp; seats</span>
+<span class="step" data-step="3">3. Pay</span>
+<span class="step" data-step="4">4. Confirmation</span>
+</div>
+<div class="toolbar">
+<label class="hint">Sort by</label>
+<select class="sort" id="sort">
+<option value="best">Best</option>
+<option value="price">Lowest price</option>
+<option value="duration">Shortest duration</option>
+<option value="depart">Earliest departure</option>
+</select>
+</div>
+<div class="grid">
+<aside class="filters">
+<div class="group">
+<h4>Stops</h4>
+<div class="switcher"><input id="nonstop" type="checkbox"/><label for="nonstop">Non‑stop only</label></div>
+</div>
+<div class="group">
+<h4>Departure time</h4>
+<input class="range" id="depRange" max="23" min="0" type="range" value="0"/>
+<div class="hint">After <span id="depAfter">00:00</span></div>
+</div>
+<div class="group">
+<h4>Airlines</h4>
+<div class="airlines" id="airlines"></div>
+</div>
+<div class="group">
+<h4>Max price</h4>
+<input class="range" id="priceMax" max="20000" min="2000" step="500" type="range" value="20000"/>
+<div class="hint">Up to ₹<span id="priceMaxVal">20000</span></div>
+</div>
+</aside>
+<div>
+<div class="result-list" id="resultsList"></div>
+</div>
+</div>
+</section>
+<!-- PASSENGERS & SEATS -->
+<section id="passengers" style="display:none">
+<div class="steps">
+<span class="step" data-step="1">1. Choose flight</span>
+<span class="step active" data-step="2">2. Passengers &amp; seats</span>
+<span class="step" data-step="3">3. Pay</span>
+<span class="step" data-step="4">4. Confirmation</span>
+</div>
+<div class="two-col">
+<div class="card">
+<h3>Passenger details</h3>
+<div class="row">
+<div class="field"><label class="label">First name</label><input class="input" id="fn" required=""/></div>
+<div class="field"><label class="label">Last name</label><input class="input" id="ln" required=""/></div>
+</div>
+<div class="row">
+<div class="field"><label class="label">Email</label><input class="input" id="em" required="" type="email"/></div>
+<div class="field"><label class="label">Phone</label><input class="input" id="ph" placeholder="10‑digit" type="tel"/></div>
+</div>
+<h3 style="margin-top:16px">Choose your seats</h3>
+<div aria-label="Seat map" class="seatmap" id="seatMap" role="grid"></div>
+<p class="hint">Tip: Blue outline = your selection | Gray = taken</p>
+<h3 style="margin-top:16px">Add‑ons</h3>
+<div class="switcher"><input id="bag" type="checkbox"><label for="bag">Extra baggage (₹500)</label></input></div>
+<div class="switcher"><input id="meal" type="checkbox"><label for="meal">Meal (₹250)</label></input></div>
+<div style="display:flex;gap:10px;margin-top:16px">
+<button class="btn ghost" id="backToResults">← Back</button>
+<button class="btn" id="toPayment">Continue to payment</button>
+</div>
+</div>
+<aside class="card summary" id="summary"></aside>
+</div>
+</section>
+<!-- PAYMENT -->
+<section id="payment" style="display:none">
+<div class="steps">
+<span class="step" data-step="1">1. Choose flight</span>
+<span class="step" data-step="2">2. Passengers &amp; seats</span>
+<span class="step active" data-step="3">3. Pay</span>
+<span class="step" data-step="4">4. Confirmation</span>
+</div>
+<div class="two-col">
+<div class="card">
+<h3>Payment</h3>
+<div class="row">
+<div class="field"><label class="label">Card holder</label><input class="input" id="ch" placeholder="As on card" required=""/></div>
+<div class="field"><label class="label">Card number</label><input class="input" id="cn" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456"/></div>
+</div>
+<div class="row">
+<div class="field"><label class="label">Expiry</label><input class="input" id="exp" maxlength="5" placeholder="MM/YY"/></div>
+<div class="field"><label class="label">CVV</label><input class="input" id="cvv" maxlength="4" placeholder="***"/></div>
+</div>
+<div class="switcher" style="margin-top:10px"><input id="tnc" type="checkbox"/><label for="tnc">I agree to the terms &amp; refund policy</label></div>
+<div style="display:flex;gap:10px;margin-top:16px">
+<button class="btn ghost" id="backToPassengers">← Back</button>
+<button class="btn" id="payNow">Pay now</button>
+</div>
+</div>
+<aside class="card summary" id="paySummary"></aside>
+</div>
+</section>
+<!-- CONFIRMATION -->
+<section id="confirmation" style="display:none">
+<div class="card" style="text-align:center">
+<h2>🎉 Booking confirmed</h2>
+<p class="sub">Your e‑ticket and invoice have been emailed. Safe travels!</p>
+<div id="confDetails" style="max-width:640px;margin:0 auto"></div>
+<div style="display:flex;gap:10px;justify-content:center;margin-top:14px">
+<a class="btn" data-link="" href="#mytrips">View my trips</a>
+<a class="btn ghost" data-link="" href="#home">Book another</a>
+</div>
+</div>
+</section>
+<!-- MY TRIPS -->
+<section id="mytrips" style="display:none">
+<div class="card">
+<h3>My trips</h3>
+<div class="result-list" id="tripsList"></div>
+</div>
+</section>
+<!-- CHATBOT -->
+<section id="chatbot" style="display:none">
+<!-- jsPDF for PDF receipts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- qrious for QR rendering -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+<body>
+<div class="stage">
+<div aria-label="SkySwift Assistant" class="chat-shell" role="application">
+<header>
+<div aria-hidden="true" class="logo">✈️</div>
+<div>
+<h1>SkySwift Assistant</h1>
+<div class="small">Type <strong>help</strong> or choose a number 1–9 from the menu.</div>
+</div>
+</header>
+<main aria-live="polite" class="chat-body" id="chat"></main>
+<div class="input-row">
+<input id="input" placeholder="Type a command (e.g., book, view, cancel T1234, help)">
+<button class="btn" id="send">Send</button>
+</input></div>
+</div>
+</div>
+<!-- UPI QR modal -->
+<div aria-hidden="true" class="modal" id="upiModal">
+<div class="modal-card">
+<h3>UPI Payment</h3>
+<canvas height="180" id="upiQR" width="180"></canvas>
+<div class="small-muted" id="upiInfo" style="margin-top:10px"></div>
+<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+<button class="btn alt" id="upiCancel">Cancel</button>
+<button class="btn" id="upiPaid">I Have Paid</button>
+</div>
+</div>
+</div>
+<!-- generic modal for card/bank/paytm inputs -->
+<div aria-hidden="true" class="modal" id="paymentModal">
+<div class="modal-card">
+<h3 id="paymentTitle">Payment</h3>
+<div id="paymentBody"></div>
+<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+<button class="btn alt" id="payCancel">Cancel</button>
+<button class="btn" id="payProceed">Proceed</button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- SUPPORT (Static content) -->
+<section id="support" style="display:none">
+<div class="card">
+<h3>Support</h3>
+<p class="sub">Reach us 24×7 at support@skyswift.test or +91‑00000‑00000. For refunds, cancellations or reschedules, open your trip and choose an action.</p>
+<ul>
+<li>Free cancellation within 24 hours for flights ≥ 7 days away.</li>
+<li>Partial refunds depend on airline policy and fare type.</li>
+<li>Reschedule fee = airline fee + ₹300 service charge.</li>
+</ul>
+</div>
+</section>
+<section class="page hidden" id="whybook">
+<div class="card">
+<h2>Why Book With Us?</h2>
+<ul>
+<li><h3>✨ Exciting deals on flights and hotels.</h3></li>
+<p>Get access to exclusive flight discounts that you won't find anywhere else.
+        We bring you seasonal offers, festive sales and special promo codes to help you save more on every booking.
+      </p>
+<li><h3>📞 24/7 support for all your bookings.</h3></li>
+<p>Our travel experts are available around the clock to assist you.
+        Whether it's a booking help, last-minute changes, or travel queries- we are always just a call or a chat away.
+      </p>
+<li><h3>⚡ Instant refunds on eligible cancellations.</h3></li>
+<p>Enjoy hassle-free cancellations with instant refunds on eligible bookings.
+        No more waiting for days- we ensure your money comes back to you quickly and securely.
+      </p>
+<li><h3>💸 Lowest price guarantee on flights &amp; packages.</h3></li>
+<p>We compare prices across airlines to give you the best deals.
+        If you find a cheaper price elsewhere, we'll match it so you always travel at the lowest cost.
+      </p>
+<li><h3>👌 Easy booking experience with trusted reviews.</h3></li>
+<p>Book your flights in just a few clicks with our user-friendly platfrom.
+        With thousands of trusted reviews, you can travel with confidence knowing you made the right choice..
+      </p>
+</ul>
+</div>
+</section>
+
+<!-- Terms(Static content) -->
+    <section id="terms" style="display:none">
+      <div class="card">
+        <h3>Terms</h3>
+        <p class="sub">The airline tickets available through the Website are subject to the terms & conditions of the concerned airline, including but not limited to cancellation and refund policies.
+</p>
+        <ul>
+          <li>SkySwift merely acts as a facilitator to enable the User to book a flight ticket. The contract of service for utilization of the flight is always between the User and the concerned airline.
+Airlines retain the right to reschedule flight times, route, change or cancel flights or itineraries independent of and without prior intimation to SkySwift. As a facilitator SkySwift has no control or authority over the logistics of the airlines and therefore is not liable for any loss, direct or incidental, that a User may incur due to such change or cancellation of a flight.</li>
+          <li>The baggage allowance on given fare is as per the terms decided by the airline, and SkySwift has no role to play in the same. Some of the fares shown in the booking flow are "hand baggage fares" which do not entitle the User for free check in baggage and therefore the User will be required to pay separately for check in baggage. The prices for adding check-in baggage to a booking may vary from airline to airline. The User is advised to contact the airlines for detailed costs.</li>
+          <li>Some airlines enter into "code share" agreements with other Airlines. This means that on certain routes, the airline carrier selling or marketing the flight ticker does not fly its own aircraft to that destination. Instead, it contracts or partners with another airline to fly to that destination. The partner airline is listed as "operated by" in the booking flow.
+            <li>The total price displayed on the Website on the payment page usually includes base fare, applicable government taxes and convenience fee. Users are required to pay the entire amount prior to the confirmation of their booking(s). In the event the User does not pay the entire amount, SkySwift reserves its right to cancel the booking. User agrees to pay all statutory taxes, surcharges and fees, as applicable on the date of travel.</li>
+If your flight is a code share, it will be disclosed to you in the booking process and prior to your payment.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- PRIVACY(Static Content)-->
+     <section id="privacy" style="display:none">
+      <div class="card">
+        <h3>Privacy</h3>
+        <p class="sub"></p>
+        <ol>
+          <li>SkySwift recognizes the importance of privacy of its users and also of maintaining confidentiality of the information provided by its users as a responsible data controller and data processer.This Privacy Policy provides for the practices for handling and securing user's Personal Information (defined hereunder) by FlyMate and its subsidiaries and affiliates.</li>
+          <li>This Privacy Policy is applicable to any person (‘User’) who purchase, intend to purchase, or inquire about any product(s) or service(s) made available by MMT through any of SkySwift customer interface channels including its website, mobile site, mobile app & offline channels including call centers and offices (collectively referred herein as "Sales Channels").For the purpose of this Privacy Policy , wherever the context so requires "you" or "your" shall mean User and the term "we", "us", "our" shall mean FlyMate. For the purpose of this Privacy Policy, Website means the webs</li>
+          <li>By using or accessing the Website or other Sales Channels, the User hereby agrees with the terms of this Privacy Policy and the contents herein. If you disagree with this Privacy Policy please do not use or access our Website or other Sales Channels.This Privacy Policy does not apply to any website(s), mobile sites and mobile apps of third parties, even if their websites/products are linked to our Website. User should take note that information and privacy practices of SkySwift business partners, advertisers, sponsors or other sites to which SkySwift provides hyperlink(s), may be materially different from this Privacy Policy. Accordingly, it is recommended that you review the privacy statements and policies of any such third parties with whom they interact.This Privacy Policy is an integral part of your User Agreement with SlySwift and all capitalized terms used, but not otherwise defined herein, shall have the respective meanings as ascribed to them in the User Agreement.</li>
+        </ol>
+        </div>
+    </section>
+<section class="page hidden" id="reviews">
+<div class="card">
+<h2>Customer Reviews</h2>
+<p>⭐ Rated Excellent by thousands of happy travelers.</p>
+<ul>
+<li>“Super easy to book, got the cheapest flights!” – Rahul M.</li>
+<li>“Refund was processed in just 2 days.” – Aditi S.</li>
+<li>“Best customer support experience ever.” – Arjun K.</li>
+<li>"I had booked a ticket through SkySwift and I cancelled the same because I had the wrong date! I was upset about cancellation fees and i have expressed my frustation to them directly and also through a negative review over trust pilot." - Dr. Babu George</li>
+<li>"Very quick and positive attitude helpful nature kept their words which matters the most" - Arshad Ahmad</li>
+<li>"Excellent Stay and Peaceful environment friendly staff's Mr. Srikanth and Team is very friendly and helpful 👍" -Dr. Rahul Gupta</li>
+</ul>
+</div>
+</section>
+</main>
+<footer>
+<div class="container" style="display:flex;gap:20px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+<span>© <span id="year"></span> SkySwift Pvt Ltd</span>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<a data-link="" href="#support">Contact</a>
+<a href="#terms" data-link>Terms</a>
+ <a href="#privacy" data-link>Privacy</a>
+</div>
+</div>
+</footer>
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+
+</div>
+<script src="scriptoold.js"></script>
+</body>
+
+</html>
